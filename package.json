@@ -21,6 +21,7 @@
     "expo-gl": "~13.0.1",
     "expo-modules-core": "^1.5.12",
     "expo-status-bar": "~1.6.0",
+    "image-js": "^0.35.5",
     "install": "^0.13.0",
     "jpeg-js": "^0.4.4",
     "npm": "^10.2.4",
