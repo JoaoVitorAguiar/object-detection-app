@@ -89,47 +89,47 @@ export default function App() {
   // };
 
   const classifyImage = async () => {
-    if (!model) {
-      Alert.alert('Error', 'The model is not loaded yet.');
-      return;
-    }
-  
-    if (!imageUrl) {
-      Alert.alert('Error', 'No image URL available.');
-      return;
-    }
-  
-    try {
-      setLoading(true);
-  
-      // Load and preprocess the image
-      const response = await fetch(imageUrl);
-      const rawImageData = await response.arrayBuffer();
-      const tensor = imageToTensor(rawImageData);
-  
-      if (tensor) {
-        // Resize the tensor to match the expected input shape [1, 640, 640, 3]
-        const resizedTensor = tf.image.resizeBilinear(tensor, [640, 640]).reshape([1, 640, 640, 3]);
-  
-        // Make predictions using the model (executeAsync instead of predict)
-        const predictions = await model.executeAsync(resizedTensor);
-  
-        // Process predictions as needed
-        // For simplicity, let's log the predictions to the console
-        console.log(predictions);
-  
-        // Update state or perform other actions based on predictions
-        setObjects(predictions);
-  
-        setLoading(false);
-      }
-    } catch (error) {
-      console.error('Error classifying the image:', error);
-      Alert.alert('Error', 'An error occurred while classifying the image.');
+  if (!model) {
+    Alert.alert('Error', 'The model is not loaded yet.');
+    return;
+  }
+
+  if (!imageUrl) {
+    Alert.alert('Error', 'No image URL available.');
+    return;
+  }
+
+  try {
+    setLoading(true);
+
+    // Load and preprocess the image
+    const response = await fetch(imageUrl);
+    const rawImageData = await response.arrayBuffer();
+    const tensor = imageToTensor(rawImageData);
+
+    if (tensor) {
+      // Resize the tensor to match the expected input shape [1, 640, 640, 3]
+      const resizedTensor = tf.image.resizeBilinear(tensor, [640, 640]).reshape([1, 640, 640, 3]);
+
+      // Make predictions using the model (executeAsync instead of predict)
+      const predictions = await model.executeAsync(resizedTensor);
+
+      // Process predictions as needed
+      // For simplicity, let's log the predictions to the console
+      console.log(predictions);
+
+      // Update state or perform other actions based on predictions
+      setObjects(predictions);
+
       setLoading(false);
     }
-  };
-  
+  } catch (error) {
+    console.error('Error classifying the image:', error);
+    Alert.alert('Error', 'An error occurred while classifying the image.');
+    setLoading(false);
+  }
+};
+
   
   return (
     <View style={styles.container}>
