@@ -6,7 +6,7 @@ import * as jpeg from 'jpeg-js';
 
 export default function App() {
   const imageUrl =
-    'https://raw.githack.com/JoaoVitorAguiar/object-detection-app/main/assets/images_test/image.jpg';
+    'https://raw.githack.com/JoaoVitorAguiar/object-detection-app/main/assets/images_test/image_02.jpg';
   const [model, setModel] = useState(null);
   const [objects, setObjects] = useState([]);
   const [loading, setLoading] = useState(true);
