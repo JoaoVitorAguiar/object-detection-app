@@ -4,9 +4,9 @@ import * as tf from '@tensorflow/tfjs';
 import { bundleResourceIO } from '@tensorflow/tfjs-react-native';
 import * as jpeg from 'jpeg-js';
 
-export default function App() {
+export default function App() { // assets\images_test\wrost_image.jpg
   const imageUrl =
-    'https://raw.githack.com/JoaoVitorAguiar/object-detection-app/main/assets/images_test/image_02.jpg';
+    'https://raw.githack.com/JoaoVitorAguiar/object-detection-app/main/assets/images_test/wrost_image.jpg';
   const [model, setModel] = useState(null);
   const [objects, setObjects] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -99,33 +99,26 @@ export default function App() {
         const scores = predictions[1].dataSync();
         const classes = predictions[2].dataSync();
 
-        // Filtrar detecções com confiança acima de um determinado limiar (por exemplo, 0.5)
-        const threshold = 0.5;
-        const filteredObjects = [];
-        for (let i = 0; i < scores.length; i++) {
-          if (scores[i] > threshold) {
-            const ymin = boxes[i * 4] * tensor.shape[0];
-            const xmin = boxes[i * 4 + 1] * tensor.shape[1];
-            const ymax = boxes[i * 4 + 2] * tensor.shape[0];
-            const xmax = boxes[i * 4 + 3] * tensor.shape[1];
+        // Encontrar o índice da detecção com o maior escore
+        const maxScoreIndex = scores.indexOf(Math.max(...scores));
 
-            const predictedClass = classes[i];
+        // Verificar se o escore é maior que 0.5
+        if (scores[maxScoreIndex] > 0.5) {
+          // Obter detalhes da detecção com o maior escore
+          const maxScoreObject = {
+            ymin: boxes[maxScoreIndex * 4] * tensor.shape[0],
+            xmin: boxes[maxScoreIndex * 4 + 1] * tensor.shape[1],
+            ymax: boxes[maxScoreIndex * 4 + 2] * tensor.shape[0],
+            xmax: boxes[maxScoreIndex * 4 + 3] * tensor.shape[1],
+            class: classes[maxScoreIndex],
+            score: scores[maxScoreIndex],
+          };
 
-            filteredObjects.push({
-              ymin,
-              xmin,
-              ymax,
-              xmax,
-              class: predictedClass,
-              score: scores[i],
-            });
+          // Atualizar o estado com a detecção de maior escore
+          setObjects([maxScoreObject]);
+
+            setLoading(false);
           }
-        }
-
-        // Atualizar o estado com as detecções
-        setObjects(filteredObjects);
-
-        setLoading(false);
       }
     } catch (error) {
       console.error('Error classifying the image:', error);
