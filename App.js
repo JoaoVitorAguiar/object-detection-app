@@ -7,7 +7,7 @@ import Svg, { Rect } from 'react-native-svg';
 
 export default function App() {
   const imageUrl =
-    'https://raw.githack.com/JoaoVitorAguiar/object-detection-app/main/assets/images_test/image.jpg';
+    'https://raw.githubusercontent.com/JoaoVitorAguiar/object-detection-app/main/assets/images_test/image.jpg';
   const [model, setModel] = useState(null);
   const [objects, setObjects] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -73,10 +73,12 @@ export default function App() {
 
     try {
       setLoading(true);
-
+      setObjects([]); // Limpa o estado dos objetos antes de cada classificação
+      
       const response = await fetch(imageUrl);
       const rawImageData = await response.arrayBuffer();
       const { tensor, width, height } = imageToTensor(rawImageData);
+      console.log(width, height)
 
       if (tensor) {
         const resizedTensor = tf.image
@@ -101,7 +103,7 @@ export default function App() {
             class: classes[maxScoreIndex],
             score: scores[maxScoreIndex],
           };
-
+          console.log(maxScoreObject)
           setObjects([maxScoreObject]);
           setTensorDims({ width, height });
         }
@@ -117,13 +119,14 @@ export default function App() {
 
   return (
     <View style={styles.container}>
+      <Text style={styles.title}>Detector</Text>
       {loading ? (
         <ActivityIndicator size="large" color="#0000ff" />
       ) : (
         <>
           <View style={styles.imageContainer}>
             <Image source={{ uri: imageUrl }} style={styles.image} />
-            <Svg height="100%" width="100%" viewBox={`0 0 ${tensorDims.width} ${tensorDims.height}`}>
+            <Svg style={styles.image} viewBox={`0 0 ${tensorDims.width} ${tensorDims.height}`}>
               {objects.map((object, index) => (
                 <Rect
                   key={index}
@@ -132,13 +135,13 @@ export default function App() {
                   width={object.xmax - object.xmin}
                   height={object.ymax - object.ymin}
                   stroke="red"
-                  strokeWidth="20"
+                  strokeWidth={tensorDims.width * 0.005} // Ajusta a espessura da linha para ser proporcional à largura da imagem
                   fill="none"
                 />
               ))}
             </Svg>
           </View>
-          <Button title="Classify Image" onPress={classifyImage} color="#841584" />
+          <Button title="Classificar Imagem" onPress={classifyImage} color="#841584" />
         </>
       )}
     </View>
@@ -152,10 +155,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#F5FCFF',
   },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 20,
+  },
   imageContainer: {
     position: 'relative',
-    width: '90%',
-    height: '50%',
+    width: 300, // largura fixa
+    height: 300, // altura fixa
     marginBottom: 20,
     borderRadius: 10,
     overflow: 'hidden',
@@ -164,5 +172,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
     width: '100%',
     height: '100%',
+    resizeMode: "contain"
   },
 });
